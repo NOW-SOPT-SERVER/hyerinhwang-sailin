@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,6 +27,11 @@ public class MemberController {
     @GetMapping("/{memberId}")
     public ResponseEntity<MemberFindDto> findMemberById(@PathVariable Long memberId){
         return ResponseEntity.ok((memberService.findMemberById(memberId)));
+    }
+
+    @GetMapping("/member-list")
+    public ResponseEntity<List<MemberFindDto>> findAllMember(){
+        return ResponseEntity.ok(memberService.findAllMember());
     }
 
     @DeleteMapping("/{memberId}")
