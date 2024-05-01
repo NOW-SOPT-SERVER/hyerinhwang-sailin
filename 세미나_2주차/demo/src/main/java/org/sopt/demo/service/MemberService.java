@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.sopt.demo.controller.dto.MemberCreateDto;
 import org.sopt.demo.controller.dto.MemberFindDto;
 import org.sopt.demo.domain.Member;
+import org.sopt.demo.common.dto.ErrorMessage;
 import org.sopt.demo.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +47,12 @@ public class MemberService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new EntityNotFoundException("ID에 해당하는 사용자가 존재하지 않습니다."));
         memberRepository.delete(member);
+    }
+
+    public Member findById(Long memberId){
+        return memberRepository.findById(memberId).orElseThrow(
+                () -> new EntityNotFoundException(String.valueOf(ErrorMessage.MEMBER_NOT_FOUND_BY_ID_EXCEPTION))
+        );
     }
 
 }
