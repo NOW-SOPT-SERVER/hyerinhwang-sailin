@@ -29,7 +29,7 @@ public class MemberController {
         return ResponseEntity.ok((memberService.findMemberById(memberId)));
     }
 
-    @GetMapping("/member-list")
+    @GetMapping("/member-list")```
     public ResponseEntity<List<MemberFindDto>> findAllMember(){
         return ResponseEntity.ok(memberService.findAllMember());
     }
