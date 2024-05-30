@@ -24,7 +24,7 @@ public class PostService {
             throw new NotFoundException(ErrorMessage.NOT_BLOG_OWNER);
         }
 
-        Post post = new Post(postCreateRequest.title(), postCreateRequest.content(), blog);
+        Post post = Post.create(blog, postCreateRequest.title(), postCreateRequest.content());
         post = postRepository.save(post);
         return post.getId().toString();
     }

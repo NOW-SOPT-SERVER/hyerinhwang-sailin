@@ -2,6 +2,7 @@ package org.sopt.demo.common;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.sopt.demo.common.dto.ErrorResponse;
+import org.sopt.demo.exception.UnauthorizedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -19,10 +20,9 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(org.sopt.demo.common.dto.ErrorResponse.of(HttpStatus.NOT_FOUND.value(), e.getMessage()));
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    protected ResponseEntity<ErrorResponse>
-    handleMethodArgumentValidException(MethodArgumentNotValidException e){
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(org.sopt.demo.common.dto.ErrorResponse.of(HttpStatus.BAD_REQUEST.value(),
-                Objects.requireNonNull(e.getBindingResult().getFieldError()).getDefaultMessage()));
+    @ExceptionHandler(UnauthorizedException.class)
+    protected ResponseEntity<ErrorResponse> handlerUnauthorizedException(UnauthorizedException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ErrorResponse.of(e.getErrorMessage().getStatus(), e.getErrorMessage().getMessage()));
     }
 }
