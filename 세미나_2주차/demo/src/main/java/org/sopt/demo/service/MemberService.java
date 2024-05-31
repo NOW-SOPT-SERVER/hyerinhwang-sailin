@@ -4,6 +4,9 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.sopt.demo.auth.UserAuthentication;
+import org.sopt.demo.auth.redis.domain.Token;
+import org.sopt.demo.auth.redis.repository.RedisTokenRepository;
+import org.sopt.demo.auth.redis.service.RedisTokenService;
 import org.sopt.demo.common.jwt.JwtTokenProvider;
 import org.sopt.demo.controller.dto.MemberCreateDto;
 import org.sopt.demo.controller.dto.MemberFindDto;
@@ -21,21 +24,25 @@ import java.util.stream.Collectors;
 public class MemberService {
 
     private final MemberRepository memberRepository;
-
     private final JwtTokenProvider jwtTokenProvider;
+    private final RedisTokenRepository redisTokenRepository;
+//    private final RedisTokenService redisTokenService;
 
     @Transactional
     public UserJoinResponse createMember(
-            MemberCreateDto memberCreate
+            MemberCreateDto memberCreateDto
     ) {
         Member member = memberRepository.save(
-                Member.create(memberCreate.name(), memberCreate.part(), memberCreate.age())
+                Member.create(memberCreateDto.name(), memberCreateDto.part(), memberCreateDto.age())
         );
         Long memberId = member.getId();
-        String accessToken = jwtTokenProvider.issueAccessToken(
-                UserAuthentication.createUserAuthentication(memberId)
-        );
-        return UserJoinResponse.of(accessToken, memberId.toString());
+        UserAuthentication userAuthentication = UserAuthentication.createUserAuthentication(memberId);
+        String accessToken = jwtTokenProvider.issueAccessToken(userAuthentication);
+        String refreshToken = jwtTokenProvider.issueRefreshToken(userAuthentication);
+//        redisTokenService.saveRefreshToken(memberId, refreshToken);
+        Token refreshTokenEntity = new Token(memberId, refreshToken);
+        redisTokenRepository.save(refreshTokenEntity);
+        return UserJoinResponse.of(accessToken, refreshToken, memberId.toString());
     }
 
     public MemberFindDto findMemberById(
